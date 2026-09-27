@@ -1,0 +1,20 @@
+server_id = "mcp_meshgen"
+display_name = "Image-to-3D MCP Server"
+version = "0.1.0"
+domain = "media"
+sdk_version = "0.3.0"
+risk_level = "low"
+# Writes only inside the configured allowed_roots.
+writes_allowed = "gated"
+transports = ["stdio"]
+credentials = []
+governance_gates = []
+environments = ["development"]
+
+# Tools are added as they're built (tasks 11-13); list_models is the bootstrap placeholder.
+[[tools]]
+name = "list_models"
+description = "List image-to-3D models with their status, licences and memory needs; never loads weights"
+risk_class = "read_only"
+requires_approval = false
+credential_bindings = []

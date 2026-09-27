@@ -1,0 +1,37 @@
+[package]
+name = "mcp-meshgen"
+version = "0.1.0"
+edition = "2024"
+authors = ["James Karanja Maina"]
+license = "Apache-2.0"
+homepage = "https://www.zavora.ai"
+repository = "https://github.com/zavora-ai/mcp-meshgen"
+rust-version = "1.94.1"
+description = "Image-to-3D MCP server with pluggable backends: local TRELLIS.2 on Apple Silicon first"
+keywords = ["mcp", "3d", "image-to-3d", "trellis", "local-ai"]
+categories = ["multimedia::images", "graphics", "development-tools"]
+
+[features]
+default = ["trellis_mac"]
+# TRELLIS.2 through trellis-mac (Apple Silicon): a Python worker in trellis-mac's venv, stdio JSON lines
+trellis_mac = []
+# deterministic fake backend and fake worker for tests and demos
+mock = []
+
+[dependencies]
+adk-mcp-sdk = { version = "0.3.0", git = "https://github.com/zavora-ai/adk-mcp-sdk.git", rev = "fd08c98466853ae368f0e5f3aae3102dde0bfc35" }
+tokio = { version = "1.47", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+async-trait = "0.1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+rmcp = { version = "3.1.2", features = ["server", "transport-io", "transport-streamable-http-server", "macros"] }
+anyhow = "1"
+thiserror = "2"
+
+[[bin]]
+name = "mcp-meshgen"
+path = "src/main.rs"
+
+[workspace]
