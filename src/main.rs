@@ -24,12 +24,18 @@ async fn main() -> anyhow::Result<()> {
         anyhow::bail!("invalid mcp-server.toml ({} error(s))", errors.len());
     }
 
-    let server = MeshGenServer;
+    // Loads config + registry only; no weights are touched at startup.
+    let server = MeshGenServer::from_default_config()?;
     let health = server.check_health().await;
     if !health.healthy {
         tracing::error!(message = ?health.message, "Health check failed");
         std::process::exit(1);
     }
+    tracing::info!(
+        config_dir = %server.config().config_dir.display(),
+        health = health.message.as_deref().unwrap_or(""),
+        "configuration loaded"
+    );
 
     tracing::info!(
         "{} v{} starting on stdio",
@@ -37,16 +43,21 @@ async fn main() -> anyhow::Result<()> {
         manifest.version
     );
     // Install signal handlers before the handshake so a stop request always gets a clean shutdown.
-    let run = async move {
-        let service = server.serve(stdio()).await?;
-        service.waiting().await?;
-        anyhow::Ok(())
+    let run = {
+        let server = server.clone();
+        async move {
+            let service = server.serve(stdio()).await?;
+            service.waiting().await?;
+            anyhow::Ok(())
+        }
     };
     tokio::select! {
         result = run => result?,
         _ = tokio::signal::ctrl_c() => tracing::info!("Ctrl-C received"),
         _ = terminate_signal() => tracing::info!("termination signal received"),
     }
+    // Don't leave a worker holding ~15-20 GB behind: it runs in its own process group.
+    server.shutdown().await;
     // The stdin reader may still be blocked; exit rather than wait for the runtime to drain it.
     std::process::exit(0);
 }

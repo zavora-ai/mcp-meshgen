@@ -11,10 +11,37 @@ credentials = []
 governance_gates = []
 environments = ["development"]
 
-# Tools are added as they're built (tasks 11-13); list_models is the bootstrap placeholder.
+[[tools]]
+name = "generate_mesh"
+description = "Convert a cut-out image into a textured 3D mesh (GLB, optional OBJ, previews and an engine-ready copy)"
+risk_class = "internal_write"
+requires_approval = false
+credential_bindings = []
+
+[[tools]]
+name = "get_job"
+description = "Get status, stage progress and result of a mesh job"
+risk_class = "read_only"
+requires_approval = false
+credential_bindings = []
+
+[[tools]]
+name = "cancel_job"
+description = "Cancel a queued or running mesh job; no partial files are left behind"
+risk_class = "internal_write"
+requires_approval = false
+credential_bindings = []
+
 [[tools]]
 name = "list_models"
 description = "List image-to-3D models with their status, licences and memory needs; never loads weights"
 risk_class = "read_only"
+requires_approval = false
+credential_bindings = []
+
+[[tools]]
+name = "unload_models"
+description = "Stop a kept-alive model worker to free its memory"
+risk_class = "internal_write"
 requires_approval = false
 credential_bindings = []

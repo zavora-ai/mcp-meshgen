@@ -21,6 +21,7 @@ mock = []
 [dependencies]
 adk-mcp-sdk = { version = "0.3.0", git = "https://github.com/zavora-ai/adk-mcp-sdk.git", rev = "fd08c98466853ae368f0e5f3aae3102dde0bfc35" }
 tokio = { version = "1.47", features = ["full"] }
+tokio-util = "0.7"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 async-trait = "0.1"
@@ -29,9 +30,31 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 rmcp = { version = "3.1.2", features = ["server", "transport-io", "transport-streamable-http-server", "macros"] }
 anyhow = "1"
 thiserror = "2"
+toml = "0.8"
+dirs = "7"
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "webp"] }
+sha2 = "0.10"
+rand = "0.9"
+base64 = "0.22"
+sysinfo = { version = "0.37", default-features = false, features = ["system"] }
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
 
 [[bin]]
 name = "mcp-meshgen"
 path = "src/main.rs"
+
+# Stand-in for the Python worker in tests; never installed (needs the `mock` feature).
+[[bin]]
+name = "fake-worker"
+path = "src/bin/fake_worker.rs"
+required-features = ["mock"]
+
+[dev-dependencies]
+tempfile = "3"
+png = "0.18"
+tokio = { version = "1.47", features = ["full", "test-util"] }
+rmcp = { version = "3.1.2", features = ["client", "transport-child-process"] }
 
 [workspace]

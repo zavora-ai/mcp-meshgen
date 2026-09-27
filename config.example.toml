@@ -1,0 +1,48 @@
+# mcp-meshgen configuration.
+# Location: $MCP_MESHGEN_CONFIG_DIR/config.toml, else the platform config dir:
+#   macOS   ~/Library/Application Support/mcp-meshgen/config.toml
+#   Linux   $XDG_CONFIG_HOME/mcp-meshgen/config.toml (~/.config/mcp-meshgen/config.toml)
+#   Windows %APPDATA%\mcp-meshgen\config.toml
+# Written on first run; edit freely. `~` is expanded. Relative paths are resolved against the config
+# directory's parent, so a project can keep its config in `<project>/.meshgen/` and list roots like "assets".
+
+# Input images are read from, and meshes written to, only these roots.
+allowed_roots = ["~/Documents/mcp-meshgen"]
+# Where meshes go when a request gives no output_dir / output_path. Empty = next to the input image.
+default_output_dir = ""
+
+default_model = "trellis2-4b"
+
+# Hugging Face hub cache holding the weights listed in models.toml. Nothing is ever downloaded by the server.
+# Empty = $HF_HUB_CACHE, then $HF_HOME/hub, then ~/.cache/huggingface/hub.
+hf_cache = ""
+
+# Blender executable for previews and post-processing. Empty = `blender` on PATH, then the usual install locations.
+blender = ""
+
+# Free memory that must remain after loading a model (MB). The server refuses rather than swapping.
+memory_headroom_mb = 2000
+# Keep the model loaded between jobs (saves ~90 s per job, holds ~15-20 GB). Default: unload after each job.
+keep_loaded = false
+# With keep_loaded, unload after this many idle seconds (0 = only on unload_models).
+idle_unload_s = 600
+# Jobs waiting behind the running one before generate_mesh returns queue_full.
+max_queue = 4
+# How long finished jobs stay queryable with get_job (seconds).
+job_ttl_s = 3600
+# Process names named in the refusal message when memory is short (matched case-insensitively, by substring).
+heavy_processes = ["UnrealEditor", "Blender", "Unity", "sd-server", "mcp-imagegen", "ollama"]
+
+[input]
+# The input must be a cut-out: an alpha channel with a real transparent background.
+min_transparent = 0.05   # share of fully transparent pixels (alpha 0) must be at least this...
+max_transparent = 0.95   # ...and at most this
+min_opaque = 0.02        # share of opaque pixels must be at least this
+opaque_alpha = 205       # a pixel counts as opaque at or above this alpha (0-255)
+
+[backends.trellis_mac]
+# TRELLIS.2 on Apple Silicon through trellis-mac (https://github.com/shivampkumar/trellis-mac).
+# Clone it and run its setup.sh, then point `dir` at the checkout. Empty = backend not configured.
+dir = ""
+# Python inside trellis-mac's venv. Empty = <dir>/.venv/bin/python (Windows: <dir>\.venv\Scripts\python.exe).
+python = ""

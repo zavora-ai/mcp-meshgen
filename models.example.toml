@@ -1,0 +1,61 @@
+# mcp-meshgen model registry. Adding a model on an existing backend is config only.
+# `files` are looked up in the Hugging Face cache (config.toml `hf_cache`); missing ones are reported by list_models
+# with their size and the exact `hf download` command. The server never downloads anything itself.
+
+[[model]]
+id = "trellis2-4b"
+name = "TRELLIS.2 4B (image to textured 3D)"
+backend = "trellis_mac"
+pipeline = "microsoft/TRELLIS.2-4B"
+quality = ["512", "1024", "1024_cascade"]
+defaults = { quality = "512", texture_size = 1024 }
+texture_sizes = [512, 1024, 2048]
+# Resident peak measured at 14.2 GB on an M4 (512 pipeline, 1024 texture); preflight adds memory_headroom_mb.
+memory_mb = 15000
+typical_s = 525
+# Faces kept before baking. trellis-mac caps this at 200k: its Metal BVH crashes on larger meshes.
+max_triangles = 200000
+# Mac-specific fixes the backend applies at load time (reported in each result).
+fixes = ["mps_sparse_decoder_cpu"]
+licence = [
+  { component = "TRELLIS.2 code and weights", licence = "MIT", commercial = true, url = "https://huggingface.co/microsoft/TRELLIS.2-4B" },
+  { component = "TRELLIS sparse-structure decoder", licence = "MIT", commercial = true, url = "https://huggingface.co/microsoft/TRELLIS-image-large" },
+  { component = "DINOv3 image encoder", licence = "DINOv3 License", commercial = true, url = "https://huggingface.co/facebook/dinov3-vitl16-pretrain-lvd1689m", note = "royalty-free; trade-control and military-use exclusions" },
+  { component = "trellis-mac (Apple Silicon port)", licence = "MIT", commercial = true, url = "https://github.com/shivampkumar/trellis-mac" },
+]
+
+[[model.files]]
+repo = "microsoft/TRELLIS.2-4B"
+mb = 14134
+paths = [
+  "pipeline.json",
+  "ckpts/ss_flow_img_dit_1_3B_64_bf16.json",
+  "ckpts/ss_flow_img_dit_1_3B_64_bf16.safetensors",
+  "ckpts/shape_dec_next_dc_f16c32_fp16.json",
+  "ckpts/shape_dec_next_dc_f16c32_fp16.safetensors",
+  "ckpts/slat_flow_img2shape_dit_1_3B_512_bf16.json",
+  "ckpts/slat_flow_img2shape_dit_1_3B_512_bf16.safetensors",
+  "ckpts/slat_flow_img2shape_dit_1_3B_1024_bf16.json",
+  "ckpts/slat_flow_img2shape_dit_1_3B_1024_bf16.safetensors",
+  "ckpts/tex_dec_next_dc_f16c32_fp16.json",
+  "ckpts/tex_dec_next_dc_f16c32_fp16.safetensors",
+  "ckpts/slat_flow_imgshape2tex_dit_1_3B_512_bf16.json",
+  "ckpts/slat_flow_imgshape2tex_dit_1_3B_512_bf16.safetensors",
+  "ckpts/slat_flow_imgshape2tex_dit_1_3B_1024_bf16.json",
+  "ckpts/slat_flow_imgshape2tex_dit_1_3B_1024_bf16.safetensors",
+]
+
+[[model.files]]
+repo = "microsoft/TRELLIS-image-large"
+mb = 141
+paths = [
+  "ckpts/ss_dec_conv3d_16l8_fp16.json",
+  "ckpts/ss_dec_conv3d_16l8_fp16.safetensors",
+]
+
+[[model.files]]
+repo = "facebook/dinov3-vitl16-pretrain-lvd1689m"
+mb = 1157
+# Gated: accept the licence on the model page (signed in) before downloading.
+gated = true
+paths = ["config.json", "preprocessor_config.json", "model.safetensors"]
